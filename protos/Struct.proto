@@ -1,0 +1,537 @@
+/*----------------------------------------------------------------
+// Copyright (C) 2018 奇安信科技集团 版权所有。
+//
+// 文件名：Struct.proto
+// 文件功能描述：通用数据结构定义
+//
+// 版本：V1.0.0
+//----------------------------------------------------------------*/
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+// QuickSSL gRPC API
+//
+// QuickSSL gRPC 接口服务提供密钥管理和密码服务
+package quick.api.grpc.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "QuickCommonStruct";
+option java_package = "org.quick.api.grpc.v1";
+option go_package = "quick/api/grpc/v1;apigrpcv1";
+option optimize_for = CODE_SIZE;
+
+
+// Value
+//
+// 值的union类型定义，必须是以下类型的一种：
+// - string_value，字符串类型
+// - integer_value，整数值
+// - boolean_value，布尔型
+// - float_value，浮点型
+// - time_value，字符串类型的时间戳
+// - time_value，时间类型
+// - date_value，日期类型
+// - day_of_week_value，星期值
+message Value {
+
+    oneof type {
+        int32 integer_value = 1;
+
+        double float_value = 2;
+
+        string string_value = 3;
+
+        bool boolean_value = 4;
+
+        bytes bytes_value = 5;
+
+        google.protobuf.Timestamp timestamp_value = 6;
+    }
+}
+
+
+enum ErrCode {
+    //操作成功
+    QK_ERR_CODE_SUCCEED       = 0x00000000;
+    //未知错误
+    QK_SDR_UNKNOWERR          = 0x01000001;
+    //不支持的接口调用
+    QK_SDR_NOTSUPPORT         = 0x01000002;
+    //与设备通信失败
+    QK_SDR_COMMFAIL           = 0x01000003;
+    //运算模块无响应
+    QK_SDR_HARDFAIL           = 0x01000004;
+    //打开设备失败
+    QK_SDR_OPENDEVICE         = 0x01000005;
+    //创建会话失败
+    QK_SDR_OPENSESSION        = 0x01000006;
+    //无私钥使用权限
+    QK_SDR_PARDENY            = 0x01000007;
+    //不存在的密钥调用
+    QK_SDR_KEYNOTEXIST        = 0x01000008;
+    //不支持的算法调用
+    QK_SDR_ALGNOTSUPPORT      = 0x01000009;
+    //不支持的算法模式调用
+    QK_SDR_ALGNOTSUPPORT_PORT = 0x0100000A;
+    //公钥运算失败
+    QK_SDR_PKOPERR            = 0x0100000B;
+    //私钥运算失败
+    QK_SDR_SKOPERR            = 0x0100000C;
+    //签名运算失败
+    QK_SDR_SIGNERR            = 0x0100000D;
+    //验证签名失败
+    QK_SDR_VERIFYERR          = 0x0100000E;
+    //对称算法运算失败
+    QK_SDR_SYMOPERR           = 0x0100000F;
+    //多步运算步骤错误
+    QK_SDR_STEPERR            = 0x01000010;
+    //文件长度超出限制
+    QK_SDR_FILESIZEERR        = 0x01000011;
+    //指定的文件不存在
+    QK_SDR_FILENOEXIST        = 0x01000012;
+    //文件起始位置错误
+    QK_SDR_FILEOFSERR         = 0x01000013;
+    //密钥类型错误
+    QK_SDR_KEYTYPEERR         = 0x01000014;
+    //密钥错误
+    QK_SDR_KEYERR             = 0x01000015;
+    //ECC加密数据错误
+    QK_SDR_ENCDATAERR         = 0x01000016;
+    //随机数产生失败
+    QK_SDR_RANDERR            = 0x01000017;
+    //私钥使用权限获取失败
+    QK_SDR_PRKRERR            = 0x01000018;
+    //MAC运算失败
+    QK_SDR_MACERR             = 0x01000019;
+    //指定文件已存在
+    QK_SDR_FILEEXISTS         = 0x0100001A;
+    //文件写入失败
+    QK_SDR_FILEWERR           = 0x0100001B;
+    //存储空间不足
+    QK_SDR_NOBUFFER           = 0x0100001C;
+    //输入参数错误
+    QK_SDR_INARGERR           = 0x0100001D;
+    //输出参数错误
+    QK_SDR_OUTARGERR          = 0x0100001E;
+    // 数字信封解密验签失败
+    QK_EVP_DEC_VERIFY_FAIL    = 0x0100001F;
+    // 数字信封解密未能找到对应私钥
+    QK_EVP_MISS_PRIVKEY       = 0x01000020;
+
+}
+
+
+enum MacAlg {
+    //未指定消息认证码算法的类型
+    QK_MAC_ALG_UNSPECIFIED = 0x00000000;
+    //消息认证码算法为使用SM3的HMAC
+    QK_HMAC_SM3            = 0x00000001;
+    //消息认证码算法为使用SHA224的HMAC
+    QK_HMAC_SHA224         = 0x00000002;
+    //消息认证码算法为使用SHA256的HMAC    
+    QK_HMAC_SHA256         = 0x00000003;
+    //消息认证码算法为使用SHA384的HMAC     
+    QK_HMAC_SHA384         = 0x00000004;
+    //消息认证码算法为使用SHA512的HMAC     
+    QK_HMAC_SHA512         = 0x00000005;
+    //消息认证码算法为使用SM4的CMAC 
+    QK_CBC_MAC_SM4         = 0x00000006;
+}
+
+enum SignAlg {
+    //未指定签名算法的类型
+    QK_SIGN_ALG_UNSPECIFIED   = 0x00000000;
+
+    //遵从 RSA PKCS1 V1.5 标准
+    //对待签名消息先求得SHA1摘要，再对摘要做RSA签名
+    QK_SGD_SHA1_RSA           = 0x00010002;
+    //对待签名消息先求得SHA256摘要，再对摘要做RSA签名    
+    QK_SGD_SHA256_RSA         = 0x00010004;
+    //对待签名消息先求得SHA224摘要，再对摘要做RSA签名       
+    QK_SIGN_SHA224_RSA        = 0x00040000;
+    //对待签名消息先求得SHA384摘要，再对摘要做RSA签名       
+    QK_SIGN_SHA384_RSA        = 0x00040001;
+    //对待签名消息先求得SHA512摘要，再对摘要做RSA签名     
+    QK_SIGN_SHA512_RSA        = 0x00040002;
+
+    //遵从 RSA PKCS1 V2.1 标准 PSS-MGF1
+    //对待签名消息先求得SHA1摘要，再对摘要做PSS填充的RSA签名
+    QK_SGD_SHA1_RSA_PSS       = 0x00010012;
+    //对待签名消息先求得SHA256摘要，再对摘要做PSS填充的RSA签名   
+    QK_SGD_SHA256_RSA_PSS     = 0x00010014;
+    //对待签名消息先求得SHA224摘要，再对摘要做PSS填充的RSA签名     
+    QK_SIGN_SHA224_RSA_PSS    = 0x00040010;
+    //对待签名消息先求得SHA384摘要，再对摘要做PSS填充的RSA签名     
+    QK_SIGN_SHA384_RSA_PSS    = 0x00040011;
+    //对待签名消息先求得SHA512摘要，再对摘要做PSS填充的RSA签名    
+    QK_SIGN_SHA512_RSA_PSS    = 0x00040012;
+
+    //ECDSA签名
+    //对待签名消息先求得SHA1摘要，再对摘要做ECDSA签名     
+    QK_SIGN_SHA1_ECDSA        = 0x00040003;
+    //对待签名消息先求得SHA224摘要，再对摘要做ECDSA签名  
+    QK_SIGN_SHA224_ECDSA      = 0x00040004;
+    //对待签名消息先求得SHA256摘要，再对摘要做ECDSA签名      
+    QK_SIGN_SHA256_ECDSA      = 0x00040005;
+    //对待签名消息先求得SHA384摘要，再对摘要做ECDSA签名      
+    QK_SIGN_SHA384_ECDSA      = 0x00040006;
+    //对待签名消息先求得SHA512摘要，再对摘要做ECDSA签名     
+    QK_SIGN_SHA512_ECDSA      = 0x00040007;
+
+    //对待签名消息先求得SM3摘要，再对摘要做SM2签名       
+    QK_SGD_SM3_SM2            = 0x00020201;
+
+    // 对摘要值作签名
+    // 摘要值为md5-16、sha1-20、sha224-28、sha256-32、sha384-48、sha512-64
+    // 采用PKCS1.5填充标准
+    QK_NONEwithRSAPKCS15      = 0x00020211;
+    // 摘要值为md5-16、sha1-20、sha224-28、sha256-32、sha384-48、sha512-64
+    // 采用RSA-PSS PKCS2.1填充标准
+    QK_NONEwithRSAPKCS21      = 0x00020212;
+
+    // ECC裸签名，摘要值为md5-16、sha1-20、sha224-28、sha256-32、sha384-48、sha512-64
+    QK_NONEwithECDSA          = 0x00020213;
+
+    // SM2裸签名，默认32字节（SM3摘要结果）
+    QK_NONEwithSM2            = 0x00020214;
+}
+
+enum SignFormat {
+    //未指定签名的格式
+    QK_SIGN_FORMAT_UNSPECIFIED = 0x00000000;
+    //PKCS1 裸签名 <r,s>
+    QK_SIGN_FORMAT_RAW         = 0x00000001;
+    //PKCS7 签名带原文
+    QK_SIGN_FORMAT_P7A         = 0x00000002;
+    //PKCS7 签名不带原文
+    QK_SIGN_FORMAT_P7D         = 0x00000003;
+}
+
+enum HashType {
+    //未指定杂凑算法类型
+    QK_HASH_TYPE_UNSPECIFIED = 0x00000000;
+    //SM3杂凑算法
+    QK_SGD_SM3               = 0x00000001;
+    //SHA256杂凑算法
+    QK_SGD_SHA256            = 0x00000004;
+    //SHA224杂凑算法
+    QK_SHA224                = 0x00000008;
+    //SHA384杂凑算法
+    QK_SHA384                = 0x00000010;
+    //SHA512杂凑算法
+    QK_SHA512                = 0x00000020;
+}
+
+enum ECCCurve {
+    //未指定ECC曲线类型
+    QK_CURVE_UNSPECIFIED     = 0x00000000;
+    //ECC曲线为SM2P256V1
+    QK_CURVE_SM2P256V1       = 0x00000001;
+    //ECC曲线为SECP256R1
+    QK_CURVE_SECP256R1       = 0x00000002;
+    //ECC曲线为SECP256K1
+    QK_CURVE_SECP256K1       = 0x00000003;    
+}
+
+// 信封格式
+enum EvpFormat {
+    QK_EVP_FORMAT_UNSPECIFIED                   = 0;
+    // GBT35275格式带签名
+    QK_EVP_FORMAT_GBT35275_WITH_SIGNATURE       = 1;
+    // GBT35275格式不带签名
+    QK_EVP_FORMAT_GBT35275_WITHOUT_SIGNATURE    = 2;
+    // PKCS7格式带签名
+    QK_EVP_FORMAT_PKCS7_WITH_SIGNATURE          = 3;
+    // PKCS7格式不带签名
+    QK_EVP_FORMAT_PKCS7_WITHOUT_SIGNATURE       = 4;
+}
+
+//对称算法类型
+//  带SGD标识和值均摘自《GMT 0006-2012 密码应用标识规范》
+enum SymAlg {
+    QK_SGD_UNSPECIFIED = 0x00000000;
+    //SM1算法 ECB CBC CFB OFB 模式
+    QK_SGD_SM1_ECB     = 0x00000101;
+    QK_SGD_SM1_CBC     = 0x00000102;
+    QK_SGD_SM1_CFB     = 0x00000104;
+    QK_SGD_SM1_OFB     = 0x00000108;
+    QK_SGD_SM1_MAC     = 0x00000110;
+    //SM4算法 ECB CBC CFB OFB 模式
+    QK_SGD_SM4_ECB     = 0x00000401;
+    QK_SGD_SM4_CBC     = 0x00000402;
+    QK_SGD_SM4_CFB     = 0x00000404;
+    QK_SGD_SM4_OFB     = 0x00000408;
+    QK_SGD_SM4_MAC     = 0x00000410;
+    QK_SGD_GCM         = 0x00000411;
+    //AES128算法 ECB CBC CFB OFB 模式
+    QK_AES128_ECB      = 0x00001001;
+    QK_AES128_CBC      = 0x00001002;
+    QK_AES128_CFB      = 0x00001004;
+    QK_AES128_OFB      = 0x00001008;
+    QK_AES128_MAC      = 0x00001010;
+    QK_AES128_GCM      = 0x00001011;
+    //AES192算法 ECB CBC CFB OFB 模式
+    QK_AES192_ECB      = 0x00002001;
+    QK_AES192_CBC      = 0x00002002;
+    QK_AES192_CFB      = 0x00002004;
+    QK_AES192_OFB      = 0x00002008;
+    QK_AES192_MAC      = 0x00002010;
+    QK_AES192_GCM      = 0x00002011;
+    //AES256算法 ECB CBC CFB OFB 模式
+    QK_AES256_ECB      = 0x00004001;
+    QK_AES256_CBC      = 0x00004002;
+    QK_AES256_CFB      = 0x00004004;
+    QK_AES256_OFB      = 0x00004008;
+    QK_AES256_MAC      = 0x00004010;
+    QK_AES256_GCM      = 0x00004011;
+    //SM1算法   
+    QK_SM1             = 0x00000100;
+    //SM4算法
+    QK_SM4             = 0x00000400;
+    //AES算法
+    QK_AES128          = 0x00001000;
+    QK_AES192          = 0x00002000;
+    QK_AES256          = 0x00004000;
+}
+
+//对称算法填充模式标识   
+enum SymAlgPaddingMode {
+    QK_SYMALG_PADDING_UNSPECIFIED = 0;
+    //不填充,明文长度需要是块大小整数倍
+    QK_SYMALG_PADDING_NO          = 1;
+    //按照PKCS7模式进行填充
+    QK_SYMALG_PADDING_PKCS7       = 2;
+    //填充0
+    QK_SYMALG_PADDING_ZEROS       = 3;
+}
+
+
+//非对称算法类型
+//  带SGD标识和值均摘自《GMT 0006-2012 密码应用标识规范》
+enum AsymmAlgo {
+    QK_ASYMMALG_TYPE_UNSPECIFIED = 0;
+    // RSA算法
+    QK_SGD_RSA   = 0x00010000;
+    // SM2椭圆曲线密码算法
+    QK_SGD_SM2   = 0x00020100;
+    // SM2椭圆曲线签名验签算法
+    QK_SGD_SM2_1 = 0x00020200;
+    // SM2椭圆曲线密钥交换算法
+    QK_SGD_SM2_2 = 0x00020400;
+    // SM2椭圆曲线加密解密算法
+    QK_SGD_SM2_3 = 0x00020800;
+    // 椭圆曲线加密解密算法
+    QK_ASYMMALG_ECC = 0x00020000;
+}
+
+//RSA填充模式
+enum RsaPaddingMode {
+    QK_RSA_PADDING_UNSPECIFIED = 0;
+    // 遵循PKCS 1.5 standard 填充模式,用于加密和签名
+    QK_RSA_PADDING_PKCS1       = 1;
+    // 遵循PKCS 2.1 standard填充模式,用于签名
+    QK_RSA_SIGN_PADDING_PKCS2  = 2;
+    // OAEP填充模式,用于加密
+    QK_RSA_ENC_PADDING_OAEP    = 3;
+    // 不填充,用于加密
+    QK_RSA_ENC_PADDING_NO      = 4;
+}
+
+//密钥有效期
+enum KeyValidityTerm  {
+    QK_TERM_UNSPECIFIED      = 0;
+    //长期有效,需要用户进行删除密钥。
+    QK_LONE_TERM             = 1;
+    //用后即销毁密钥
+    QK_FAILURE_AFTER_USE     = 2;
+}
+
+//返回工作密钥形式
+enum GenerateKeyType {
+    QK_KEY_TYPE_UNSPECIFIED = 0;
+    // 返回key id
+    QK_KEY_TYPE_ID          = 1;
+    // 返回密钥值
+    QK_KEY_TYPE_VALUE       = 2;
+}
+
+//密钥协商算法类型
+//带SGD标识和值均摘自《GMT 0006-2012 密码应用标识规范》
+enum AgreementAlgo {
+    QK_ALGO_UNSPECIFIED = 0;
+    // 基于ECC的ECDH算法
+    QK_ALGO_ECDH  = 0x00021000;
+    // 基于ECC的ECDHE算法
+    QK_ALGO_ECDHE = 0x00022000;
+    // SM2椭圆曲线密钥交换算法
+    QK_ALGO_SM2DH = 0x00024000;
+}
+
+// 时间戳解析项,参考《GM/T 0033-2014 时间戳接口规范》
+enum ItemNum {
+    QK_ITEMNUM_UNSPECIFIED = 0x00000000;
+    // 签发时间
+    QK_STF_TIME_OF_STAMP = 0x00000001;
+    // 签发者的通用名
+    QK_STF_CN_OF_TSSIGNER = 0x00000002;
+    // 时间戳请求的原始信息
+    QK_STF_ORINGINAL_DATA = 0x00000003;
+    // 时间戳服务器的证书
+    QK_STF_CERT_OF_TSSERVER = 0x00000004;
+    // 时间戳服务器的证书链
+    QK_STF_CERTCHAIN_OF_TSSERVER = 0x00000005;
+    // 时间源的来源
+    QK_STF_SOURCE_OF_TIME = 0x00000006;
+    // 时间精度
+    QK_STF_TIME_PRECISION = 0x00000007;
+    // 响应方式
+    QK_STF_RESPONSE_TYPE = 0x00000008;
+    // 签发者国家
+    QK_STF_SUBJECT_COUNTRY_OF_TSSIGNER = 0x00000009;
+    // 签发者组织
+    QK_STF_SUBJECT_ORGNIZATION_OF_TSSIGNER = 0x0000000A;
+    // 签发者城市
+    QK_STF_SUBJECT_CITY_OF_TSSIGNER = 0x0000000B;
+    // 签发者联系用电子信箱
+    QK_STF_SUBJECT_EMAIL_OF_TSSIGNER = 0x0000000C;
+}
+
+// 验证证书级别,参考《GM/T 0029-2014 签名验签服务器技术规范》
+enum VerifyCertLevel {
+    // 验证时间
+    QK_VERIFY_TIME          = 0;
+    // 验证时间和根证书签名
+    QK_VERIFY_TIME_SIGN     = 1;
+    // 验证时间、根证书签名和CRL
+    QK_VERIFY_TIME_SIGN_CRL = 2;
+}
+
+//对称算法参数  
+message SymAlgParam {
+    //CBC OFB 等模式，需要参数iv
+    bytes iv  = 1;
+    //附加消息，GCM模式加密需要设置aad
+    bytes aad = 2;
+    //消息认证码，GCM模式解密需要设置mac
+    bytes mac = 3;
+}
+
+message Status {
+
+    //错误码，0为成功，非0为错误
+    ErrCode code = 1;
+
+    //错误信息
+    string msg   = 2;
+}
+
+/************************ SDF ************************/
+// 设备信息
+message DEVICEINFO {
+    // 设备生产厂商名称
+    bytes issuer_name         = 1;
+    // 设备型号
+    bytes device_name         = 2;
+    // 设备编号：日期(8bytes)+批次号(3bytes)+流水号(5bytes)
+    bytes device_serial       = 3;
+    // 密码设备内部软件的版本号
+    uint32 device_version     = 4;
+    // 密码设备支持的接口规范版本号
+    uint32 standard_version   = 5;
+    // 前四字节表示支持的算法，非对称算法按位或的结果;后四字节表示算法最大模长，支持的模长按位或的结果
+    uint32 asym_alg_ability_0 = 6;
+    uint32 asym_alg_ability_1 = 7;
+    // 所有支持的对称算法标识按位或的结果
+    uint32 sym_alg_ability    = 8;
+    // 所有支持的杂凑算法标识按位或的结果
+    uint32 hash_alg_ability   = 9;
+    // 支持的最大文件存储空间(单位字节)
+    uint32 buffer_size        = 10;
+}
+
+// RSA公钥
+message RSArefPublicKey {
+    // 模长
+    uint32 bits = 1;
+    // 模N
+    bytes m     = 2;
+    // 公钥指数
+    bytes e     = 3;
+}
+
+// RSA私钥
+message RSArefPrivateKey {
+    // 模长
+    uint32 bits   = 1;
+    // 模N
+    bytes m       = 2;
+    // 公钥指数
+    bytes e       = 3;
+    // 私钥指数
+    bytes d       = 4;
+    // 素数p和q
+    bytes prime_0 = 5;
+    bytes prime_1 = 6;
+    // Dp和Dq
+    bytes pexp_0  = 7;
+    bytes pexp_1  = 8;
+    // 系数i
+    bytes coef    = 9;
+}
+
+// ECC公钥
+message ECCrefPublicKey {
+    // 密钥位长
+    uint32 bits = 1;
+    // 公钥x坐标
+    bytes x     = 2;
+    // 公钥y坐标
+    bytes y     = 3;
+}
+
+// ECC私钥
+message ECCrefPrivateKey {
+    // 密钥位长
+    uint32 bits = 1;
+    // 私钥
+    bytes k     = 2;
+}
+
+// ECC加密数据
+message ECCCipher {
+    // X分量
+    bytes x  = 1;
+    // Y分量
+    bytes y  = 2;
+    // 明文的杂凑值
+    bytes m  = 3;
+    // 密文数据长度
+    uint32 l = 4;
+    // 密文数据
+    bytes c  = 5;
+}
+
+// ECC签名数据
+message ECCSignature {
+    // 签名的r部分
+    bytes r = 1;
+    // 签名的s部分
+    bytes s = 2;
+}
+
+// ECC加密密钥对保护
+message EnvelopedKeyBlob {
+    // 保护对称密钥的非对称算法标识
+    uint64 asymm_alg_id       = 1;
+    // 对称算法标识
+    uint64 symm_alg_id        = 2;
+    // 对称密钥密文
+    ECCCipher ecc_cipehr_blob = 3;
+    // 加密密钥对的公钥
+    ECCrefPublicKey pub_key   = 4;
+    // 加密密钥对的私钥密文
+    bytes encrypted_privKey   = 5;
+}
+/************************ SDF end ************************/
+
