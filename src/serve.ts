@@ -97,7 +97,7 @@ class ServeClient {
     const { isOpen, caPath, clientStorePath, pfxCode } = this.ssl;
     if (!isOpen) return grpc.credentials.createInsecure();
     const rootCerts = caPath ? fs.readFileSync(caPath) : null;
-    const { key: privateKey, certificate } = await parsePfx(clientStorePath, pfxCode);
+    const { privateKey, certificate } = await parsePfx(clientStorePath, pfxCode);
     return grpc.credentials.createSsl(rootCerts, Buffer.from(privateKey), Buffer.from(certificate));
   }
 
