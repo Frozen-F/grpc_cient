@@ -5,6 +5,7 @@
   "main": "./lib/cipher.js",
   "types": "./lib/cipher.d.ts",
   "scripts": {
+    "s": "nodemon ./example/server.js",
     "e": "ts-node ./example/index.ts",
     "lint": "eslint src --fix --ext .ts",
     "build": "rimraf lib && tsc --build",
