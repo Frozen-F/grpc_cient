@@ -1,7 +1,7 @@
 export interface Option {
   addr: string,
   rootCertPath: string,
-  privateKeyPath: string,
+  clientStorePath: string,
   authority?: string,
   timeout?: number
 }

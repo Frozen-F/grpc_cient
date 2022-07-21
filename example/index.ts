@@ -8,7 +8,7 @@ async function main() {
   const client = await new Cipher({
     addr: '10.48.57.27:8443',
     rootCertPath: '../certs/cacert.pem',
-    privateKeyPath: '../certs/client.pfx',
+    clientStorePath: '../certs/client.pfx',
     authority: 'quickservice',
     timeout: 50000
   }).init();

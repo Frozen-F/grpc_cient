@@ -10,22 +10,22 @@ class CipherClient {
   private serve:ServeClient;
 
   constructor(option:Cipler.Option) {
-    const { addr, rootCertPath, privateKeyPath, authority = 'quickservice', timeout = 5000 } = option;
+    const { addr, rootCertPath, clientStorePath, authority = 'quickservice', timeout = 5000 } = option;
     const { PROTO_PATH, PACKAGE_NAME, SERVE_NAME, PFX_CODE } = projectConfig;
     this.serve = new ServeClient({
       uri: addr,
       ssl: {
         isOpen: true,
         rootCertPath,
-        privateKeyPath,
+        clientStorePath,
+        pfxCode: PFX_CODE,
         authority
       },
       timeout,
       config: {
         PROTO_PATH,
         PACKAGE_NAME,
-        SERVE_NAME,
-        PFX_CODE
+        SERVE_NAME
       }
     });
   }

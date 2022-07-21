@@ -24,8 +24,7 @@ class ServeClient {
   private config:Config = {
     PROTO_PATH: '',
     PACKAGE_NAME: '',
-    SERVE_NAME: '',
-    PFX_CODE: ''
+    SERVE_NAME: ''
   };
   /** 加密服务的地址，格式为“IP:端口”，例如：192.168.1.1:8443 */
   private address: string | string[] = '';
@@ -38,6 +37,7 @@ class ServeClient {
     isOpen: false,
     caPath: '', // 根证书
     clientStorePath: '', // 客户端私钥与证书
+    pfxCode: '',
     authority: ''
   };
 
@@ -52,11 +52,12 @@ class ServeClient {
   private initOption({ uri, ssl, timeout = 2000, config }: ClientOption) {
     this.address = uri;
     this.timeout = timeout;
-    const { rootCertPath, privateKeyPath, authority, isOpen = false } = ssl || {};
+    const { rootCertPath, clientStorePath, pfxCode, authority, isOpen = false } = ssl || {};
     Object.assign(this.ssl, {
       isOpen,
       caPath: rootCertPath ? path.join(__dirname, rootCertPath) : '',
-      clientStorePath: privateKeyPath ? path.join(__dirname, privateKeyPath) : '',
+      clientStorePath: clientStorePath ? path.join(__dirname, clientStorePath) : '',
+      pfxCode,
       authority
     });
     Object.assign(this.config, config);
@@ -93,10 +94,10 @@ class ServeClient {
 
   /** 获取授权信息 */
   public async getCredentials(): Promise<ChannelCredentials> {
-    const { isOpen, caPath, clientStorePath } = this.ssl;
+    const { isOpen, caPath, clientStorePath, pfxCode } = this.ssl;
     if (!isOpen) return grpc.credentials.createInsecure();
     const rootCerts = caPath ? fs.readFileSync(caPath) : null;
-    const { key: privateKey, certificate } = await parsePfx(clientStorePath, this.config.PFX_CODE);
+    const { key: privateKey, certificate } = await parsePfx(clientStorePath, pfxCode);
     return grpc.credentials.createSsl(rootCerts, Buffer.from(privateKey), Buffer.from(certificate));
   }
 
