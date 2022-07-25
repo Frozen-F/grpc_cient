@@ -1,7 +1,6 @@
 /* *
  * 密码客户端实例
  * */
-const path = require('path');
 import fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
@@ -11,7 +10,8 @@ import { ChannelCredentials } from '@grpc/grpc-js';
 import getClientOptions from './utils/clientOptions';
 import { parsePfx } from './utils/pfxUtils';
 import { camelCase } from './utils';
-import { Reply, ClientOption, Config } from './constant/common';
+import { ClientOption, Config } from './constant/serve';
+import { Reply } from './constant/common';
 
 
 /**
@@ -55,8 +55,8 @@ class ServeClient {
     const { rootCertPath, clientStorePath, pfxCode, authority, isOpen = false } = ssl || {};
     Object.assign(this.ssl, {
       isOpen,
-      caPath: rootCertPath ? path.join(__dirname, rootCertPath) : '',
-      clientStorePath: clientStorePath ? path.join(__dirname, clientStorePath) : '',
+      caPath: rootCertPath,
+      clientStorePath,
       pfxCode,
       authority
     });
