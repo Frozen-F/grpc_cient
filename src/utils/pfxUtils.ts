@@ -1,20 +1,14 @@
-const Pfx = require('../lib/parsePfx');
+import { getPrivateKey, getCertificate } from './parsePfx';
 
-interface Reply {
-  privateKey: string;
-  certificate: string;
-}
-
-const parsePfx = async(path:string, password:string = ''):Promise<Reply>=>{
+const parsePfx = async(path:string, password:string = ''):Promise<Record<'privateKey'| 'certificate', string>>=>{
   if (!path) throw new Error('The path cannot be empty');
-  const { key: privateKey, certificate } = await Pfx.toPem({
+  const params = {
     path,
     password
-  });
-
+  };
   return {
-    privateKey,
-    certificate
+    privateKey: await getPrivateKey(params),
+    certificate: await getCertificate(params)
   };
 };
 

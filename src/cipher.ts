@@ -115,7 +115,7 @@ class CipherClient {
    * @param plainText 原文
    */
   async signData({ plainText }: Cipler.SignDataRequest):Promise<Reply<Cipler.SignDataResponse>> {
-    return await this.myProxy('SignData', { 'plain_text': Buffer.from(plainText, 'base64') });
+    return await this.myProxy('SignData', { 'plain_text': Buffer.from(plainText) });
   }
 
   /**
@@ -129,12 +129,22 @@ class CipherClient {
   async verifySignedData({ certId, plainText, signText, certPath, verifyLevel }: Cipler.VerifySignedDataRequest):Promise<Reply<Cipler.VerifySignedDataResponse>> {
     const req = {
       'cert_id': certId,
-      'plain_text': Buffer.from(plainText, 'base64'),
+      'plain_text': Buffer.from(plainText),
       'sign_text': signText,
-      'cert_data': fs.readFileSync(certPath),
+      'cert_data': certPath ? fs.readFileSync(certPath) : null,
       'verify_level': verifyLevel
     };
-    return await this.myProxy('verifySignedData', req);
+    let { err, response } = await this.myProxy('verifySignedData', req);
+    if (err?.message.startsWith('10 ABORTED: CryptoServiceHSM::VerifySignedData error')) {
+      response = {
+        verifyResult: false
+      };
+      err = null;
+    }
+    return {
+      err,
+      response
+    };
   }
 
   /**
@@ -143,13 +153,13 @@ class CipherClient {
    * @param macAlg mac 算法,暂只支持QK_HMAC_SM3,QK_CBC_MAC_SM4
    * @param plainText 明文数据
    */
-  async calculateMAC({ keyId, macAlg, plainText }: Cipler.CalculateMACRequest):Promise<Reply<Cipler.CalculateMACResponse>> {
+  async calculateMAC({ keyId = 'default', macAlg, plainText }: Cipler.CalculateMACRequest):Promise<Reply<Cipler.CalculateMACResponse>> {
     const req = {
-      'cert_id': keyId,
+      'key_id': keyId,
       'mac_alg': macAlg,
-      'plain_text': Buffer.from(plainText, 'base64')
+      'plain_text': Buffer.from(plainText)
     };
-    return await this.myProxy('calculateMAC', req);
+    return await this.myProxy('CalculateMAC', req);
   }
 
   /**
@@ -158,22 +168,38 @@ class CipherClient {
    * @param macAlg mac 算法,暂只支持QK_HMAC_SM3,QK_CBC_MAC_SM4
    * @param plainText 明文数据
    */
-  async verifyMAC({ keyId, macAlg, plainText, macText }: Cipler.VerifyMACRequest):Promise<Reply<Cipler.VerifyMACResponse>> {
-    const req = {
-      'cert_id': keyId,
-      'mac_alg': macAlg,
-      'plain_text': Buffer.from(plainText, 'base64'),
-      'mac_Text': macText
+  async verifyMAC({ keyId = 'default', macAlg, plainText, macText }: Cipler.VerifyMACRequest):Promise<Reply<Cipler.VerifyMACResponse>> {
+    // VerifyMAC 不好使
+    // const req = {
+    //   'key_id': keyId,
+    //   'mac_alg': macAlg,
+    //   'plain_text': Buffer.from(plainText),
+    //   'mac_Text': macText
+    // };
+    // console.log(req);
+    // return await this.myProxy('VerifyMAC', req);
+    const { err, response } = await this.calculateMAC({ keyId, macAlg, plainText });
+    if (err) {
+      return {
+        err,
+        response: null
+      };
+    }
+    const baseMacText = response?.macText;
+    return {
+      err: null,
+      response: {
+        verifyResult: macText.toString('base64') === baseMacText?.toString('base64')
+      }
     };
-    return await this.myProxy('verifyMAC', req);
+    
   }
 
   /**
-   * <p>以数字信封方式对明文数据进行加密。每个envelopeId对应唯一对称加密密钥，该加密密钥由加密服务生成，并使用接收者的公钥
-   * 进行加密。</p>
+   * 以数字信封方式对明文数据进行加密。每个envelopeId对应唯一对称加密密钥，该加密密钥由加密服务生成，并使用接收者的公钥进行加密。
    * @param envelopeId 数字信封标识，由调用者指定，格式为数字和字母。每个envelopeId对应唯一对称加密密钥
    * @param receiverId 数字信封的接收者标识
-   * @param plainText 待加密的明文数据
+   * @param plainText 明文数据
    */
   async evpEncryptData({ envelopeId, receiverId, plainText }: Cipler.EvpEncryptDataRequest):Promise<Reply<Cipler.EvpEncryptDataResponse>> {
     const req = {
@@ -188,7 +214,7 @@ class CipherClient {
   }
 
   /**
-   * <p>对数字信封加密的密文进行解密，得到明文数据。</p>
+   * 对数字信封加密的密文进行解密，得到明文数据。
    * @param envelopeId 数字信封ID
    * @param cipherText 使用数字信封加密的数据
    */
@@ -197,10 +223,52 @@ class CipherClient {
       'enve_id': envelopeId,
       'cipher_text': cipherText.toString('base64')
     };
-    const res = await this.myProxy('dataDecrypt', req);
-    if (res.err) return res;
-    res.response.plainText = Buffer.from(res.response.plainText, 'base64');
-    return res;
+    let { err, response } = await this.myProxy('dataDecrypt', req);
+    if (err?.message.startsWith('10 ABORTED: CryptoServiceHSM::VerifySignedData error')) {
+      response = {
+        verifyResult: false
+      };
+      err = null;
+    }
+    return {
+      err,
+      response
+    };
+  }
+
+  /**
+   * 创建时间戳
+   * @param plainText 明文数据
+   */
+  async createTS({ plainText }: Cipler.CreateTSRequest):Promise<Reply<Cipler.CreateTSResponse>> {
+    const req = {
+      'plain_text': Buffer.from(plainText)
+    };
+    return await this.myProxy('CreateTS', req);
+  }
+
+  /**
+   * 创建时间戳
+   * @param tsText 时间戳
+   */
+  async verifyTS({ tsText }: Cipler.VerifyTSRequest):Promise<Reply<Cipler.VerifyTSResponse>> {
+    const req = {
+      'ts_text': tsText
+    };
+    return await this.myProxy('VerifyTS', req);
+  }
+
+  /**
+   * 获取时间戳信息
+   * @param tsText 时间戳
+   * @param itemNum 信息项编号
+   */
+  async getTSDetailInfo({ tsText, itemNum }: Cipler.GetTSDetailInfoRequest):Promise<Reply<Cipler.GetTSDetailInfoResponse>> {
+    const req = {
+      'ts_text': tsText,
+      'item_num': itemNum
+    };
+    return await this.myProxy('GetTSDetailInfo', req);
   }
 };
 

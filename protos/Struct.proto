@@ -137,6 +137,7 @@ enum MacAlg {
     QK_HMAC_SHA512         = 0x00000005;
     //消息认证码算法为使用SM4的CMAC 
     QK_CBC_MAC_SM4         = 0x00000006;
+
 }
 
 enum SignAlg {

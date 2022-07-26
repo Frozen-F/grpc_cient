@@ -78,7 +78,7 @@ class ServeClient {
     const packageDefinition = protoLoader.loadSync(
       PROTO_PATH,
       {
-        keepCase: true, /**保持字段大小写，而不是转换为驼色大小写*/
+        keepCase: true,
         longs: String,
         enums: String,
         defaults: true,

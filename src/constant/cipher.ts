@@ -9,15 +9,25 @@ export interface Option {
 type SymAlgPaddingMode = 0 | 1 | 2 | 3
 // 0: 验证时间 1:验证时间和根证书签名 2:验证时间、根证书签名和CRL
 type VerifyCertLevel = 0 | 1 | 2
-// 0x00000000未指定消息认证码算法的类型
 
-// 0x00000001消息认证码算法为使用SM3的HMAC
-// 0x00000002消息认证码算法为使用SHA224的HMAC
-// 0x00000003消息认证码算法为使用SHA256的HMAC    
-// 0x00000004消息认证码算法为使用SHA384的HMAC     
-// 0x00000005消息认证码算法为使用SHA512的HMAC     
-// 0x00000006消息认证码算法为使用SM4的CMAC 
-type MacAlg = '0x00000000' | '0x00000001' | '0x00000002' | '0x00000003' | '0x00000004' | '0x00000005' | '0x00000006'
+
+type MacAlg = 'QK_HMAC_SM3'
+              | 'QK_CBC_MAC_SM4'
+// 时间戳解析项,参考《GM/T 0033-2014 时间戳接口规范》
+type ItemNum = 'QK_ITEMNUM_UNSPECIFIED'
+              | 'QK_STF_TIME_OF_STAMP'
+              | 'QK_STF_CN_OF_TSSIGNER'
+              | 'QK_STF_ORINGINAL_DATA'
+              | 'QK_STF_CERT_OF_TSSERVER'
+              | 'QK_STF_CERTCHAIN_OF_TSSERVER'
+              | 'QK_STF_SOURCE_OF_TIME'
+              | 'QK_STF_TIME_PRECISION'
+              | 'QK_STF_RESPONSE_TYPE'
+              | 'QK_STF_SUBJECT_COUNTRY_OF_TSSIGNER'
+              | 'QK_STF_SUBJECT_ORGNIZATION_OF_TSSIGNER'
+              | 'QK_STF_SUBJECT_CITY_OF_TSSIGNER'
+              | 'QK_STF_SUBJECT_EMAIL_OF_TSSIGNER'
+
 /* 对称加密
 -----------------------------------------*/
 export interface SymmEncryptRequest {
@@ -76,11 +86,11 @@ export interface SignDataResponse {
 /* 数字验签请求
 -----------------------------------------*/
 export interface VerifySignedDataRequest {
-  certId: string; // 证书标识
   plainText: string; // 原文
   signText: Buffer; // 签名值
-  certPath: string; // 证书数据地址,支持pem,der,base64
-  verifyLevel: VerifyCertLevel; // 证书验证级别
+  certId?: string; // 证书标识
+  certPath?: string; // 证书数据地址,支持pem,der,base64
+  verifyLevel?: VerifyCertLevel; // 证书验证级别
 }
 export interface VerifySignedDataResponse {
   verifyResult: boolean; // 验证结果
@@ -132,4 +142,33 @@ export interface EvpDecryptDataRequest {
 }
 export interface EvpDecryptDataResponse {
   plainText: string; // 明文数据
+}
+
+/* 生成时间戳
+-----------------------------------------*/
+export interface CreateTSRequest {
+  plainText: string;
+}
+export interface CreateTSResponse {
+  tsText: Buffer;
+}
+
+/* 验证时间戳
+-----------------------------------------*/
+export interface VerifyTSRequest {
+  tsText: Buffer;
+}
+export interface VerifyTSResponse {
+  verifyResult: Boolean;
+}
+
+/* 解析时间戳信息
+-----------------------------------------*/
+export interface GetTSDetailInfoRequest {
+  tsText: Buffer;
+  itemNum: ItemNum;
+}
+
+export interface GetTSDetailInfoResponse {
+  itemValue: Buffer;
 }

@@ -25,45 +25,40 @@ async function asymEncryptAndasymDecrypt(client:Cipher) {
 }
 
 // 签名验签
-// todo 验签未通
 async function signAnyVerifyData(client:Cipher) {
   const { err, response } = await client.signData({ plainText: '12345678' });
   console.log('signData', { err, response });
   if (err || !response) {
     return;
   }
-  const decrypt = await client.verifySignedData({
-    certId: 'default',
-    plainText: '1',
-    signText: response.signText,
-    certPath: path.join(__dirname, '../certs/cacert.pem'),
-    verifyLevel: 1
+  const verifySignedData = await client.verifySignedData({
+    plainText: '12345678',
+    signText: response.signText
   });
-  console.log('verifySignedData', decrypt);
+  console.log('verifySignedData', verifySignedData);
 }
 
 // MAC计算与验证
-// todo 没通client无calculateMAC和verifyMAC需要改首字母大写···但是calculateMAC会报错
 async function calculateAnyVerifyMac(client:Cipher) {
-  const { err, response } = await client.calculateMAC({ keyId: 'default', macAlg: '0x00000001', plainText: '1234565' });
-  console.log('calculateMAC', { err, response });
+  let { err, response } = await client.calculateMAC({ keyId: 'default', macAlg: 'QK_HMAC_SM3', plainText: 'asd' });
+  console.log('calculateMAC1', { err, response });
   if (err || !response) {
     return;
   }
-  const decrypt = await client.verifyMAC({
+  const verifyMAC = await client.verifyMAC({
     keyId: 'default',
-    macAlg: '0x00000001',
-    plainText: '1234565',
+    macAlg: 'QK_HMAC_SM3',
+    plainText: 'asd',
     macText: response?.macText
   });
-  console.log('verifyMAC', decrypt);
+  console.log('verifyMAC', verifyMAC);
 }
 
 // 数字信封解密解密
 async function evpEncryptDataAndevpDecryptData(client:Cipher) {
   const { err, response } = await client.evpEncryptData({
-    envelopeId: '123456789123',
-    receiverId: '1',
+    envelopeId: '12345678',
+    receiverId: 'qmtest',
     plainText: '12345678'
   });
   console.log('evpEncryptData', { err, response });
@@ -71,27 +66,58 @@ async function evpEncryptDataAndevpDecryptData(client:Cipher) {
     return;
   }
   const decrypt = await client.evpDecryptData({
-    envelopeId: '123456789123',
+    envelopeId: '12345678',
     cipherText: response.cipherText
   });
   console.log('evpDecryptData', decrypt);
 }
 
+// 时间戳
+// todo未调试
+async function createAndVerifyAndDetailTS(client:Cipher) {
+  const { err, response } = await client.createTS({
+    plainText: '12345678'
+  });
+  console.log('createTS', { err, response });
+  if (err || !response) {
+    return;
+  }
+  const verifyTS = await client.verifyTS({
+    // tsText: response.tsText
+    tsText: Buffer.from('ssdds')
+  });
+  console.log('verifyTS', verifyTS);
+  const getTSDetailInfo = await client.getTSDetailInfo({
+    // tsText: response.tsText,
+    tsText: Buffer.from('ssdds'),
+    itemNum: 'QK_ITEMNUM_UNSPECIFIED'
+  });
+  console.log('getTSDetailInfo', getTSDetailInfo);
+}
 
 async function main() {
   const client = await new Cipher({
-    addr: '10.48.57.27:8443',
+    // addr: '10.48.57.27:8443',
+    addr: '10.48.57.26:9527',
     rootCertPath: path.join(__dirname, '../certs/cacert.pem'),
     clientStorePath: path.join(__dirname, '../certs/client.pfx'),
     authority: 'quickservice',
     timeout: 50000
   }).init();
 
+  // // 对称加密解密
   // await symmEncryptAndsymmDecrypt(client);
+  // // 非对称加密解密
   // await asymEncryptAndasymDecrypt(client);
+  // // 签名验签
   // await signAnyVerifyData(client);
+  // // MAC计算与验证
   // await calculateAnyVerifyMac(client);
-  await evpEncryptDataAndevpDecryptData(client);
+  // // 数字信封解密解密
+  // await evpEncryptDataAndevpDecryptData(client);
+  // // 时间戳
+  // await createAndVerifyAndDetailTS(client);
+  
   client.close();
 
   // const client = await new Serve({
