@@ -8,8 +8,8 @@ export interface Option {
 }
 declare type SymAlgPaddingMode = 0 | 1 | 2 | 3;
 declare type VerifyCertLevel = 0 | 1 | 2;
-declare type MacAlg = '0x00000000' | '0x00000001' | '0x00000002' | '0x00000003' | '0x00000004' | '0x00000005' | '0x00000006';
-declare type ItemNum = '0x00000000' | '0x00000001' | '0x00000002' | '0x00000003' | '0x00000004' | '0x00000005' | '0x00000006' | '0x00000007' | '0x00000008' | '0x00000009' | '0x0000000A' | '0x0000000B' | '0x0000000C';
+declare type MacAlg = 'QK_HMAC_SM3' | 'QK_CBC_MAC_SM4';
+declare type ItemNum = 'QK_ITEMNUM_UNSPECIFIED' | 'QK_STF_TIME_OF_STAMP' | 'QK_STF_CN_OF_TSSIGNER' | 'QK_STF_ORINGINAL_DATA' | 'QK_STF_CERT_OF_TSSERVER' | 'QK_STF_CERTCHAIN_OF_TSSERVER' | 'QK_STF_SOURCE_OF_TIME' | 'QK_STF_TIME_PRECISION' | 'QK_STF_RESPONSE_TYPE' | 'QK_STF_SUBJECT_COUNTRY_OF_TSSIGNER' | 'QK_STF_SUBJECT_ORGNIZATION_OF_TSSIGNER' | 'QK_STF_SUBJECT_CITY_OF_TSSIGNER' | 'QK_STF_SUBJECT_EMAIL_OF_TSSIGNER';
 export interface SymmEncryptRequest {
     plainText: string;
     keyId?: string;
@@ -50,11 +50,11 @@ export interface SignDataResponse {
     signText: Buffer;
 }
 export interface VerifySignedDataRequest {
-    certId: string;
     plainText: string;
     signText: Buffer;
-    certPath: string;
-    verifyLevel: VerifyCertLevel;
+    certId?: string;
+    certPath?: string;
+    verifyLevel?: VerifyCertLevel;
 }
 export interface VerifySignedDataResponse {
     verifyResult: boolean;

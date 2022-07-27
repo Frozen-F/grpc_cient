@@ -32,7 +32,7 @@ class CipherClient {
   }
 
   public async init() {
-    this.serve = await this.serve.initClient();
+    this.serve = await this.serve.init();
     return this;
   }
 
@@ -40,12 +40,8 @@ class CipherClient {
     return this.serve.close();
   }
 
-  public throw(err:string = '异常') {
-    throw new Error(err);
-  }
-
   public myProxy(method:string, ...arg:any[]) {
-    if (!this.serve) this.throw('The client is not initialized');
+    if (!this.serve) throw new Error('The client is not initialized');
     return this.serve.myProxy(method, ...arg);
   }
 

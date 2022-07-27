@@ -64,7 +64,7 @@ class ServeClient {
   }
 
   /** 初始化客户端 */
-  public async initClient() {
+  public async init() {
     const { address, timeout, ssl, config } = this;
     const proto = this.getProto();
     const credentials = await this.getCredentials();
