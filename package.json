@@ -5,8 +5,8 @@
   "main": "./lib/cipher.js",
   "types": "./lib/cipher.d.ts",
   "scripts": {
-    "s": "nodemon ./example/server.ts",
     "e": "ts-node ./example/index.ts",
+    "server": "nodemon ./example/server.ts",
     "lint": "eslint src --fix --ext .ts",
     "build": "rimraf lib && tsc --build",
     "build:pack": "npm-pack-all --output package/"

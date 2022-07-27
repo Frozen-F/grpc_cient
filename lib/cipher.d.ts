@@ -5,7 +5,6 @@ declare class CipherClient {
     constructor(option: Cipler.Option);
     init(): Promise<this>;
     close(): void;
-    throw(err?: string): void;
     myProxy(method: string, ...arg: any[]): Promise<Reply<any>>;
     symmEncrypt({ plainText, keyId, alg, iv, padding }: Cipler.SymmEncryptRequest): Promise<Reply<Cipler.SymmEncryptResponse>>;
     symmDecrypt({ cipherText, keyId, alg, iv, padding }: Cipler.SymmDecryptRequest): Promise<Reply<Cipler.SymmDecryptResponse>>;

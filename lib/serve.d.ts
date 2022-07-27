@@ -10,7 +10,7 @@ declare class ServeClient {
     client: ServiceClient | null;
     constructor(option: ClientOption);
     private initOption;
-    initClient(): Promise<this>;
+    init(): Promise<this>;
     getProto(): Record<string, any>;
     getCredentials(): Promise<ChannelCredentials>;
     myProxy(method: string, ...arg: any[]): Promise<Reply<any>>;
