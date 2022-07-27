@@ -1,19 +1,18 @@
 /* *
  * 密码服务客户端
  * */
-import ServeClient from './serve';
-import { Reply } from './constant/common';
-import * as Cipler from './constant/cipher';
+import { Client, Reply } from '@fxs0819/grpc-client';
+import * as Cipler from './constant';
 import projectConfig from './config';
 import fs from 'fs';
 
 class CipherClient {
-  private serve:ServeClient;
+  private serve:Client;
 
   constructor(option:Cipler.Option) {
     const { addr, rootCertPath, clientStorePath, authority = 'quickservice', timeout = 5000 } = option;
     const { PROTO_PATH, PACKAGE_NAME, SERVE_NAME, PFX_CODE } = projectConfig;
-    this.serve = new ServeClient({
+    this.serve = new Client({
       uri: addr,
       ssl: {
         isOpen: true,

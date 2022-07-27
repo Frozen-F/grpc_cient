@@ -1,5 +1,5 @@
-import { Reply } from './constant/common';
-import * as Cipler from './constant/cipher';
+import { Reply } from '@fxs0819/grpc-client';
+import * as Cipler from './constant';
 declare class CipherClient {
     private serve;
     constructor(option: Cipler.Option);

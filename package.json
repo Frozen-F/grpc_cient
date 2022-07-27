@@ -1,9 +1,9 @@
 {
-  "name": "cipher",
+  "name": "cipher-client",
   "version": "1.0.0",
-  "description": "",
-  "main": "./lib/cipher.js",
-  "types": "./lib/cipher.d.ts",
+  "description": "Cipher Grpc Client",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "e": "ts-node ./example/index.ts",
     "server": "nodemon ./example/server.ts",
@@ -19,15 +19,15 @@
     "grpc"
   ],
   "license": "ISC",
+  "dependencies": {
+    "@fxs0819/grpc-client": "^1.0.0"
+  },
   "devDependencies": {
-    "@grpc/grpc-js": "^1.6.7",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
     "eslint": "^8.19.0",
-    "google-protobuf": "^3.20.1",
     "npm-pack-all": "^1.12.7",
     "ts-node": "^10.8.2",
-    "typescript": "^4.7.4",
-    "x509.js": "^1.0.0"
+    "typescript": "^4.7.4"
   }
 }
