@@ -10,9 +10,32 @@ import { ChannelCredentials } from '@grpc/grpc-js';
 import getClientOptions from './utils/clientOptions';
 import { parsePfx } from './utils/pfxUtils';
 import { camelCase } from './utils';
-import { ClientOption, Config } from './constant/serve';
-import { Reply } from './constant/common';
 
+export interface Reply<T> {
+  response: T | null,
+  err: Error | null
+}
+
+export interface Config {
+  PROTO_PATH: string, // proto文件地址
+  PACKAGE_NAME: string; // proto文件对应package
+  SERVE_NAME: string; // 服务名称
+}
+  
+  
+// 客户端配置
+export interface ClientOption {
+  uri: string | string[];
+  config: Config; // proto配置
+  ssl?: {
+    rootCertPath?: string; // 根证书
+    clientStorePath?: string; // 私钥和证书文件地址
+    authority?: string; // grpc.ssl_target_name_override
+    pfxCode?: string; // 私钥和证书文件（pfx）解析需要的密码
+    isOpen: boolean; // 默认为false
+  };
+  timeout?: number; // 单次grpc timeout
+}
 
 /**
   * @param uri 加密服务的地址列表，格式为“IP:端口”，例如：new String[]{"192.168.1.1:8443", "192.168.1.2:8443"}
@@ -20,7 +43,7 @@ import { Reply } from './constant/common';
   * @param KeyStorePath SDK客户端的证书与私钥文件
   * @param authority 密码服务名称（与服务证书的Common Name保持一致），默认为quickservice
   */
-class ServeClient {
+export class Client {
   private config:Config = {
     PROTO_PATH: '',
     PACKAGE_NAME: '',
@@ -137,4 +160,3 @@ class ServeClient {
 
 };
 
-export default ServeClient;
