@@ -1,12 +1,13 @@
 {
-  "name": "fg-grpc-client",
-  "version": "1.0.0",
-  "description": "customize grpc client",
+  "name": "@fxs0819/grpc-client",
+  "version": "1.0.1",
+  "description": "Customize Grpc Client",
   "scripts": {
     "e": "ts-node ./example/index.ts",
     "s": "nodemon ./example/server.js",
     "lint": "eslint src --fix --ext .ts",
-    "build": "rimraf lib && tsc --build"
+    "build": "rimraf lib && tsc --build",
+    "publish": "npm publish --access public"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.6.8",
