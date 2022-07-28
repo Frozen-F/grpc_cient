@@ -1,36 +1,44 @@
-# grpc客户端
+grpc-client
+===
 
-> node版本基于服务端提供protos快速建立连接的客户端中间件.
-> [grpc文档](https://www.grpc.io/docs/languages/node/)
-> [grpc中文文档](http://doc.oschina.net/grpc?t=60135)
-> [grpc github](https://github.com/grpc/grpc)
+node版本基于服务端提供protos快速建立连接的客户端中间件.
 
-### 准备
+[api](https://www.grpc.io/docs/languages/node/) [api(中文)](http://doc.oschina.net/grpc?t=60135) [github](https://github.com/grpc/grpc)
+
+## Installation
+
+Install with npm
+
+    npm install @fxs0819/grpc-client
+
+
+:warning: 请确保您的系统/容器上已经安装了' openssl '
+
+## Examples
+
+```javascript
+const config = {
+    uri: '0.0.0.0:50051',
+    ssl: {
+        isOpen: false
+        // rootCertPath: path.join(__dirname, './certs/cacert.pem'),
+        // clientStorePath: path.join(__dirname, './certs/client.pfx'),
+        // pfxCode: 'qianxin.quick.50843197',
+        // authority: 'quickservice'
+    },
+    timeout: 5000,
+    config: {
+        PROTO_PATH: path.join(__dirname, './protos/Hello.proto'),
+        PACKAGE_NAME: 'hello',
+        SERVE_NAME: 'MainGreeter'
+    }
+};
+const client:Client = await new Client(config).init();
+const res = await client.myProxy('sayHello', { 'name': 'Tom' });
+console.log(res);
+client.close();
 ```
-1、启动客户端（可跟根据官方实例确保服务端已启动）
-2、导入proto文件
-```
 
-### 使用
+## License
 
-``` bash
-
-interface ClientOption {
-  uri: string | string[];
-  config: { // proto配置
-    PROTO_PATH: string, // proto文件地址
-    PACKAGE_NAME: string; // proto文件对应package
-    SERVE_NAME: string; // 服务名称
-  };
-  ssl?: {
-    rootCertPath?: string; // 根证书
-    clientStorePath?: string; // 私钥和证书文件地址
-    authority?: string; // grpc.ssl_target_name_override
-    pfxCode?: string; // 私钥和证书文件（pfx）解析需要的密码
-    isOpen: boolean; // 默认为false
-  };
-  timeout?: number; // 单次grpc timeout
-}
-
-const client = await new ServeClient(option: ClientOption).init()
-
+**MIT**

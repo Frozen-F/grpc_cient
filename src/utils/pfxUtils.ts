@@ -1,8 +1,11 @@
 import pem, { Pkcs12ReadResult } from 'pem';
 
 const parsePfxUtil = (path:string, password:string):Promise<Pkcs12ReadResult>=>{
-  return new Promise((resolve)=>{
+  return new Promise((resolve, reject)=>{
     pem.readPkcs12(path, { p12Password: password }, (err:any, res:Pkcs12ReadResult) => {
+      if (err) {
+        reject(err);
+      }
       resolve(res);
     });
   });
