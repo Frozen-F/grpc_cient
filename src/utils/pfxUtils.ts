@@ -1,14 +1,20 @@
-import { getPrivateKey, getCertificate } from './parsePfx';
+import pem, { Pkcs12ReadResult } from 'pem';
+
+const parsePfxUtil = (path:string, password:string):Promise<Pkcs12ReadResult>=>{
+  return new Promise((resolve)=>{
+    pem.readPkcs12(path, { p12Password: password }, (err:any, res:Pkcs12ReadResult) => {
+      resolve(res);
+    });
+  });
+};
+
 
 const parsePfx = async(path:string, password:string = ''):Promise<Record<'privateKey'| 'certificate', string>>=>{
   if (!path) throw new Error('The path cannot be empty');
-  const params = {
-    path,
-    password
-  };
+  const { key, cert } = await parsePfxUtil(path, password);
   return {
-    privateKey: await getPrivateKey(params),
-    certificate: await getCertificate(params)
+    privateKey: key,
+    certificate: cert
   };
 };
 

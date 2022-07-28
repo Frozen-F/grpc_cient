@@ -1,7 +1,7 @@
 # grpc客户端
 
 > node版本基于服务端提供protos快速建立连接的客户端中间件.
-> [grpc文档]（https://www.grpc.io/docs/languages/node/)
+> [grpc文档](https://www.grpc.io/docs/languages/node/)
 > [grpc中文文档](http://doc.oschina.net/grpc?t=60135)
 > [grpc github](https://github.com/grpc/grpc)
 
