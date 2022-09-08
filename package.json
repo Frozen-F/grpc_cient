@@ -11,10 +11,8 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.6.8",
-    "@types/pem": "^1.9.6",
     "google-protobuf": "^3.20.1",
-    "pem": "^1.14.6",
-    "x509.js": "^1.0.0"
+    "p12-pem": "^1.0.5"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.30.5",
