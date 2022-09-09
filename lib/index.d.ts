@@ -29,9 +29,9 @@ export declare class Client {
     client: ServiceClient | null;
     constructor(option: ClientOption);
     private initOption;
-    init(): Promise<this>;
+    init(): this;
     getProto(): Record<string, any>;
-    getCredentials(): Promise<ChannelCredentials>;
+    getCredentials(): ChannelCredentials;
     myProxy(method: string, ...arg: any[]): Promise<Reply<any>>;
     close(): void;
 }

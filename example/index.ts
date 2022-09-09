@@ -18,7 +18,7 @@ async function main() {
       SERVE_NAME: 'MainGreeter'
     }
   };
-  const client:Client = await new Client(config).init();
+  const client:Client = new Client(config);
   const res = await client.myProxy('sayHello', { 'name': 'Tom' });
   console.log(res);
   client.close();

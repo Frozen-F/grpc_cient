@@ -84,13 +84,14 @@ export class Client {
       authority
     });
     Object.assign(this.config, config);
+    this.init();
   }
 
   /** 初始化客户端 */
-  public async init() {
+  public init() {
     const { address, timeout, ssl, config } = this;
     const proto = this.getProto();
-    const credentials = await this.getCredentials();
+    const credentials = this.getCredentials();
     this.client = new proto[config.SERVE_NAME](address, credentials, getClientOptions({ timeout, ssl }));
     return this;
   }
@@ -116,11 +117,11 @@ export class Client {
   }
 
   /** 获取授权信息 */
-  public async getCredentials(): Promise<ChannelCredentials> {
+  public getCredentials(): ChannelCredentials {
     const { isOpen, caPath, clientStorePath, pfxCode } = this.ssl;
     if (!isOpen) return grpc.credentials.createInsecure();
     const rootCerts = caPath ? fs.readFileSync(caPath) : null;
-    const { privateKey, certificate } = await parsePfx(clientStorePath, pfxCode);
+    const { privateKey, certificate } = parsePfx(clientStorePath, pfxCode);
     return grpc.credentials.createSsl(rootCerts, Buffer.from(privateKey), Buffer.from(certificate));
   }
 

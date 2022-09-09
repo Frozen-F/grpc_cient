@@ -47,7 +47,7 @@ function chop(array:string[], quantity:number) {
   return result;
 }
 
-const parsePfx = async(path:string, password:string = ''):Promise<Record<'privateKey'| 'certificate', string>>=>{
+const parsePfx = (path:string, password:string = ''):Record<'privateKey'| 'certificate', string>=>{
   if (!path) throw new Error('The path cannot be empty');
   const { pemKey, pemCertificate } = p12.getPemFromP12(path, password);
   return {
