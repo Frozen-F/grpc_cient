@@ -1,4 +1,4 @@
-import * as p12 from 'p12-pem';
+import * as p12 from './p12ToPem';
 // import pem, { Pkcs12ReadResult } from 'pem';
 
 // const parsePfxUtil = (path:string, password:string):Promise<Pkcs12ReadResult>=>{
