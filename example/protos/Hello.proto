@@ -20,6 +20,9 @@ package hello;
 service MainGreeter {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
+
+  // Sends a stream greeting
+  rpc SayMultiHello (stream HelloRequest) returns (HelloReply) {}
 }
 
 // The request message containing the user's name.

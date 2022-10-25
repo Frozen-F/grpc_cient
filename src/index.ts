@@ -5,7 +5,9 @@ import fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ServiceClient } from '@grpc/grpc-js/build/src/make-client';
-import { ChannelCredentials } from '@grpc/grpc-js';
+import { ChannelCredentials, Deadline } from '@grpc/grpc-js';
+import * as lodash from 'lodash';
+import { PassThrough } from 'stream';
 
 import getClientOptions from './utils/clientOptions';
 import { parsePfx } from './utils/pfxUtils';
@@ -34,7 +36,7 @@ export interface ClientOption {
     pfxCode?: string; // 私钥和证书文件（pfx）解析需要的密码
     isOpen: boolean; // 默认为false
   };
-  timeout?: number; // 单次grpc timeout
+  timeout?: number | undefined; // 拦截器中单次grpc timeout
 }
 
 /**
@@ -53,7 +55,7 @@ export class Client {
   private address: string | string[] = '';
 
   /** Timeout */
-  private timeout : number = 2000;
+  private timeout : number | undefined = undefined;
 
   /** ssl配置信息 */
   private ssl = {
@@ -72,7 +74,7 @@ export class Client {
   }
 
   /** 设置配置信息等 */
-  private initOption({ uri, ssl, timeout = 2000, config }: ClientOption) {
+  private initOption({ uri, ssl, timeout, config }: ClientOption) {
     this.address = uri;
     this.timeout = timeout;
     const { rootCertPath, clientStorePath, pfxCode, authority, isOpen = false } = ssl || {};
@@ -94,6 +96,16 @@ export class Client {
     const credentials = this.getCredentials();
     this.client = new proto[config.SERVE_NAME](address, credentials, getClientOptions({ timeout, ssl }));
     return this;
+  }
+
+  public waitForReady(deadline: Deadline): Promise<void> {
+    return new Promise((resolve, reject)=>{
+      this.client?.waitForReady(deadline, (err)=>{
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+    
   }
 
   /** 获取proto对象 */
@@ -126,24 +138,33 @@ export class Client {
   }
 
   /** 代理 */
-  public myProxy(method:string, ...arg:any[]): Promise<Reply<any>> {
+  public myProxy(method:string, data:Record<string, any> | PassThrough, ...args: any[]): Promise<Reply<any>> {
+    const callback = (resolve:any) => {
+      return (err:any, response:any)=>{
+        if (response) {
+          for (const key of Object.keys(response)) {
+            const camelCaseKey = camelCase(key);
+            if (key === camelCaseKey) continue;
+            response[camelCaseKey] = response[key];
+            delete response[key];
+          }
+        }
+        resolve({
+          err,
+          response
+        });
+      };
+    };
     return new Promise((resolve)=>{
       try {
         if (!this.client) throw Error('no client');
-        this.client[method](...arg, (err:any, response:any)=>{
-          if (response) {
-            for (const key of Object.keys(response)) {
-              const camelCaseKey = camelCase(key);
-              if (key === camelCaseKey) continue;
-              response[camelCaseKey] = response[key];
-              delete response[key];
-            }
-          }
-          resolve({
-            err,
-            response
-          });
-        });
+        const isStream = lodash.isFunction(data.read) && lodash.isFunction(data.on);
+        if (isStream) {
+          const call = this.client[method](...args, callback(resolve));
+          data.pipe(call);
+          return;
+        }
+        this.client[method](data, ...args, callback(resolve));
       } catch (err: any) {
         resolve({
           response: null,

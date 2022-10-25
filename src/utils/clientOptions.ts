@@ -5,13 +5,15 @@ import { InterceptorOptions, InterceptingCall, ClientOptions } from '@grpc/grpc-
  *  @describe grpc客户端配置的options
   * @param timeout 超时
   */
-export default ({ timeout = 2000, ssl }: {timeout:number, ssl: Record<string, any> }): ClientOptions=>{
+export default ({ timeout, ssl }: {timeout:number | undefined, ssl: Record<string, any> }): ClientOptions=>{
   return {
     'grpc.ssl_target_name_override': ssl.authority, 
     // 拦截器
     interceptors: [
       (options:InterceptorOptions, nextCall:Function): InterceptingCall=>{
-        options.deadline = new Date().getTime() + timeout;
+        if (timeout) {
+          options.deadline = new Date().getTime() + timeout;
+        }
         const requester = {
           // // 在启动出站调用之前调用的拦截方法。
           // start() {},
