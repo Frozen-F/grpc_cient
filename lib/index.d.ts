@@ -1,5 +1,7 @@
+/// <reference types="node" />
 import { ServiceClient } from '@grpc/grpc-js/build/src/make-client';
-import { ChannelCredentials } from '@grpc/grpc-js';
+import { ChannelCredentials, Deadline } from '@grpc/grpc-js';
+import { PassThrough } from 'stream';
 export interface Reply<T> {
     response: T | null;
     err: Error | null;
@@ -19,7 +21,7 @@ export interface ClientOption {
         pfxCode?: string;
         isOpen: boolean;
     };
-    timeout?: number;
+    timeout?: number | undefined;
 }
 export declare class Client {
     private config;
@@ -30,8 +32,9 @@ export declare class Client {
     constructor(option: ClientOption);
     private initOption;
     init(): this;
+    waitForReady(deadline: Deadline): Promise<void>;
     getProto(): Record<string, any>;
     getCredentials(): ChannelCredentials;
-    myProxy(method: string, ...arg: any[]): Promise<Reply<any>>;
+    myProxy(method: string, data: Record<string, any> | PassThrough, ...args: any[]): Promise<Reply<any>>;
     close(): void;
 }

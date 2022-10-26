@@ -1,6 +1,6 @@
 {
   "name": "@fxs0819/grpc-client",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Customize Grpc Client",
   "scripts": {
     "e": "ts-node ./example/index.ts",
