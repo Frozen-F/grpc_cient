@@ -23,8 +23,9 @@ async function main() {
   const client:Client = new Client(config);
   const deadline = new Date().getTime() + 1000;
   await client.waitForReady(deadline);
-  await sayHello(client);
+  // await sayHello(client);
   await sayMultiHello(client);
+  // await receiveMultiHello(client);
   client.close();
 
 }
@@ -49,9 +50,19 @@ async function sayMultiHello(client:Client) {
   }
   async.series(senders, () => {
     stream.end();
-
   });
   const sayMultiHello = await sayMultiHelloCall;
   console.log(sayMultiHello);
+}
+
+async function receiveMultiHello(client:Client) {
+  const call = client.client?.receiveMultiHello({ 'name': 'Tom' });
+  call.on('data', function(data:any) {
+    console.log(data);
+  });
+
+  call.on('end', ()=>{
+    console.log('end');
+  });
 }
 main();

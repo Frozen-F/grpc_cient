@@ -23,6 +23,9 @@ service MainGreeter {
 
   // Sends a stream greeting
   rpc SayMultiHello (stream HelloRequest) returns (HelloReply) {}
+
+  // Receive a stream greeting
+  rpc ReceiveMultiHello (HelloRequest) returns (stream HelloReply) {}
 }
 
 // The request message containing the user's name.

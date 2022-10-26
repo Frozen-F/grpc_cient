@@ -4,7 +4,7 @@
   "description": "Customize Grpc Client",
   "scripts": {
     "e": "ts-node ./example/index.ts",
-    "s": "nodemon ./example/server.js",
+    "s": "ts-node ./example/server.ts",
     "lint": "eslint src --fix --ext .ts",
     "build": "rimraf lib && tsc --build",
     "publish_ap": "npm run build && npm publish --access public"

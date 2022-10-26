@@ -26,7 +26,6 @@ const config = {
         // pfxCode: 'qianxin.quick.50843197',
         // authority: 'quickservice'
     },
-    timeout: 5000,
     config: {
         PROTO_PATH: path.join(__dirname, './protos/Hello.proto'),
         PACKAGE_NAME: 'hello',
@@ -37,6 +36,29 @@ const client:Client = await new Client(config);
 const res = await client.myProxy('sayHello', { 'name': 'Tom' });
 console.log(res);
 client.close();
+```
+
+```javascript
+import { PassThrough } from 'stream';
+import * as lodash from 'lodash';
+import * as async from 'async';
+
+const stream = new PassThrough({ objectMode: true });
+const sayMultiHelloCall = client.myProxy('sayMultiHello', stream);
+
+const senders: any[] = [];
+for (var i = 0; i < 10; i++) {
+  senders[i] = (function(i) {
+    return (callback:any)=>{
+      stream.write({ name: `name${i}` });
+      lodash.delay(callback, 1000);
+    };
+  }(i));
+}
+async.series(senders, () => {
+  stream.end();
+});
+const sayMultiHello = await sayMultiHelloCall;
 ```
 
 ## License
